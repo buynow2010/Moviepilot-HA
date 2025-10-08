@@ -1,8 +1,10 @@
 {
   "name": "MoviePilot",
-  "domains": ["sensor", "binary_sensor", "notify"],
-  "render_readme": true,
+  "content_in_root": false,
+  "filename": "moviepilot",
   "homeassistant": "2024.1.0",
-  "iot_class": "Cloud Polling",
-  "content_in_root": false
+  "render_readme": true,
+  "zip_release": false,
+  "domains": ["sensor", "binary_sensor", "notify"],
+  "iot_class": "Cloud Polling"
 }
