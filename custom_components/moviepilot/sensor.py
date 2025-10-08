@@ -154,7 +154,6 @@ class MoviePilotCPUSensor(MoviePilotSensorBase):
     _attr_icon = ICON_CPU
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, coordinator: MoviePilotDataUpdateCoordinator, entry: ConfigEntry) -> None:
         """Initialize the sensor."""
@@ -173,7 +172,6 @@ class MoviePilotMemorySensor(MoviePilotSensorBase):
     _attr_icon = ICON_MEMORY
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     def __init__(self, coordinator: MoviePilotDataUpdateCoordinator, entry: ConfigEntry) -> None:
         """Initialize the sensor."""

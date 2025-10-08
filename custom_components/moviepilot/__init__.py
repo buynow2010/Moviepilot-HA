@@ -23,10 +23,8 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
+    Platform.NOTIFY,
 ]
-
-# Notify platform (setup separately)
-NOTIFY_PLATFORM = Platform.NOTIFY
 
 # Service schema
 SERVICE_SEND_NOTIFICATION_SCHEMA = vol.Schema(
@@ -85,19 +83,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # 设置平台
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # 设置 notify 平台（使用 discovery）
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, NOTIFY_PLATFORM)
-    )
-
-    # 加载 notify 服务（通过 discovery）
-    await hass.helpers.discovery.async_load_platform(
-        NOTIFY_PLATFORM,
-        DOMAIN,
-        {"entry_id": entry.entry_id},
-        hass.data[DOMAIN],
-    )
-
     # 注册服务
     async def handle_send_notification(call: ServiceCall) -> None:
         """Handle send notification service call."""
@@ -133,10 +118,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # 先卸载 notify 平台
-    await hass.config_entries.async_forward_entry_unload(entry, NOTIFY_PLATFORM)
-
-    # 卸载其他平台
+    # 卸载所有平台
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
