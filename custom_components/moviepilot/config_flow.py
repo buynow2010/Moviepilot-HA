@@ -209,6 +209,14 @@ class CannotConnect(HomeAssistantError):
         super().__init__()
         self.message = message
 
+    def __str__(self) -> str:
+        """Return error message."""
+        return self.message
+
+
+class InvalidAuth(HomeAssistantError):
+    """Error to indicate there is invalid auth."""
+
 
 class MoviePilotOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle MoviePilot options."""
@@ -249,11 +257,3 @@ class MoviePilotOptionsFlowHandler(config_entries.OptionsFlow):
         )
 
         return self.async_show_form(step_id="init", data_schema=schema)
-
-    def __str__(self) -> str:
-        """Return error message."""
-        return self.message
-
-
-class InvalidAuth(HomeAssistantError):
-    """Error to indicate there is invalid auth."""

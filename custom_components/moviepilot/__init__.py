@@ -16,6 +16,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import MoviePilotAPIClient, MoviePilotAuthError, MoviePilotConnectionError
 from .const import DATA_CLIENT, DOMAIN
 from .sensor import MoviePilotDataUpdateCoordinator
+from .webhook import async_setup_webhook, get_webhook_url
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -108,6 +109,35 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             schema=SERVICE_SEND_NOTIFICATION_SCHEMA,
         )
         _LOGGER.info("已注册 moviepilot.send_notification 服务")
+
+    # 设置 Webhook 接收器（全局设置，只执行一次）
+    if "webhook_setup" not in hass.data[DOMAIN]:
+        webhook_success = await async_setup_webhook(hass)
+
+        if webhook_success:
+            hass.data[DOMAIN]["webhook_setup"] = True
+
+            # 获取并显示 Webhook URL
+            webhook_url = get_webhook_url(hass)
+
+            if webhook_url:
+                _LOGGER.info("=" * 80)
+                _LOGGER.info("MoviePilot Webhook Receiver Enabled")
+                _LOGGER.info("=" * 80)
+                _LOGGER.info("Webhook URL: %s", webhook_url)
+                _LOGGER.info("")
+                _LOGGER.info("Configuration in MoviePilot:")
+                _LOGGER.info("  1. Go to Settings -> Notifications")
+                _LOGGER.info("  2. Add Webhook notification channel")
+                _LOGGER.info("  3. URL: %s", webhook_url)
+                _LOGGER.info("  4. Method: POST")
+                _LOGGER.info('  5. Body: {"title": "{title}", "text": "{message}", "type": "{type}"}')
+                _LOGGER.info("=" * 80)
+            else:
+                _LOGGER.warning("Webhook enabled but URL could not be determined")
+                _LOGGER.warning("You may need to configure 'external_url' in configuration.yaml")
+        else:
+            _LOGGER.error("Failed to set up webhook receiver")
 
     # 监听配置更新
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))

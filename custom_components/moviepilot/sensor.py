@@ -1,7 +1,7 @@
 """MoviePilot sensor platform."""
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 from typing import Any
 
@@ -63,13 +63,8 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up MoviePilot sensors from a config entry."""
-    client: MoviePilotAPIClient = hass.data[DOMAIN][entry.entry_id][DATA_CLIENT]
-
-    # 创建coordinator
-    coordinator = MoviePilotDataUpdateCoordinator(hass, client)
-
-    # 首次刷新数据
-    await coordinator.async_config_entry_first_refresh()
+    # 获取已创建的coordinator（在__init__.py中创建）
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
 
     # 创建所有传感器（12个传感器：10个原有 + 2个消息通知）
     sensors: list[SensorEntity] = [
@@ -416,8 +411,6 @@ class MoviePilotDownloadMessageSensor(MoviePilotSensorBase):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional attributes."""
-        from datetime import datetime
-
         return {
             "download_speed": self.coordinator.data.get("downloader_download_speed", 0),
             "total_downloaded": self.coordinator.data.get("downloader_total_downloaded", 0),
@@ -454,8 +447,6 @@ class MoviePilotDownloadMessageSensor(MoviePilotSensorBase):
 
     def _fire_event(self, message_type: str, title: str, message: str) -> None:
         """触发 Home Assistant 事件"""
-        from datetime import datetime
-
         self.hass.bus.async_fire(
             f"{DOMAIN}_notification",
             {
@@ -529,8 +520,6 @@ class MoviePilotTransferMessageSensor(MoviePilotSensorBase):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional attributes."""
-        from datetime import datetime
-
         return {
             "is_transferring": self.coordinator.data.get("is_transferring", False),
             "transfer_data": self.coordinator.data.get("transfer_data", {}),
@@ -568,8 +557,6 @@ class MoviePilotTransferMessageSensor(MoviePilotSensorBase):
 
     def _fire_event(self, message_type: str, title: str, message: str) -> None:
         """触发 Home Assistant 事件"""
-        from datetime import datetime
-
         self.hass.bus.async_fire(
             f"{DOMAIN}_notification",
             {
@@ -587,5 +574,3 @@ class MoviePilotTransferMessageSensor(MoviePilotSensorBase):
             title,
             message,
         )
-
-
