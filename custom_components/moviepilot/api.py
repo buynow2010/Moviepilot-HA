@@ -568,7 +568,7 @@ class MoviePilotAPIClient:
         Args:
             title: 通知标题
             message: 通知内容
-            notification_type: 通知类型 (默认: Manual)
+            notification_type: 通知类型 (Manual/System/Download/Transfer)
 
         Returns:
             是否发送成功
@@ -576,22 +576,70 @@ class MoviePilotAPIClient:
         Raises:
             MoviePilotAPIError: 发送失败
         """
+        # 验证通知类型
+        valid_types = ["Manual", "System", "Download", "Transfer"]
+        if notification_type not in valid_types:
+            _LOGGER.warning(
+                "Invalid notification type '%s', defaulting to 'Manual'. Valid: %s",
+                notification_type,
+                ", ".join(valid_types),
+            )
+            notification_type = "Manual"
+
+        # 构建请求数据
         data = {
             "title": title,
             "text": message,
             "type": notification_type,
         }
 
+        _LOGGER.debug(
+            "Preparing notification: title='%s', type='%s', message_length=%d",
+            title,
+            notification_type,
+            len(message),
+        )
+
         try:
             result = await self._request("POST", API_ENDPOINT_MESSAGE, data=data)
 
-            if isinstance(result, dict) and result.get("success"):
-                _LOGGER.info("通知发送成功: %s", title)
-                return True
+            # 验证响应
+            if isinstance(result, dict):
+                success = result.get("success", False)
+
+                if success:
+                    _LOGGER.info(
+                        "✅ Notification sent successfully: [%s] %s",
+                        notification_type,
+                        title,
+                    )
+                    return True
+                else:
+                    error_msg = result.get("message", "Unknown error")
+                    _LOGGER.warning(
+                        "⚠️ Notification failed: [%s] %s - Response: %s",
+                        notification_type,
+                        title,
+                        error_msg,
+                    )
+                    return False
             else:
-                _LOGGER.warning("通知发送失败: %s", result)
+                _LOGGER.warning(
+                    "⚠️ Unexpected response format for notification: %s",
+                    type(result).__name__,
+                )
                 return False
 
+        except MoviePilotAuthError:
+            _LOGGER.error("❌ Authentication failed while sending notification")
+            raise
+        except MoviePilotConnectionError:
+            _LOGGER.error("❌ Connection failed while sending notification")
+            raise
         except Exception as err:
-            _LOGGER.error("发送通知时出错: %s", err)
+            _LOGGER.error(
+                "❌ Unexpected error sending notification: %s - %s",
+                type(err).__name__,
+                err,
+            )
             raise

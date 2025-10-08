@@ -63,6 +63,7 @@ class MoviePilotNotifyEntity(NotifyEntity):
             **kwargs: Additional parameters
                 - data: Additional data dictionary
                     - type: Notification type (default: "Manual")
+                      Valid types: Manual, System, Download, Transfer
         """
         # Get notification title
         if title is None:
@@ -71,6 +72,16 @@ class MoviePilotNotifyEntity(NotifyEntity):
         # Get notification type from data
         data = kwargs.get("data") or {}
         notification_type = data.get("type", NOTIFY_TYPE_MANUAL)
+
+        # Validate notification type
+        valid_types = ["Manual", "System", "Download", "Transfer"]
+        if notification_type not in valid_types:
+            _LOGGER.warning(
+                "Invalid notification type '%s', using 'Manual'. Valid types: %s",
+                notification_type,
+                ", ".join(valid_types),
+            )
+            notification_type = NOTIFY_TYPE_MANUAL
 
         _LOGGER.debug(
             "Sending notification to MoviePilot: title='%s', type='%s', message_length=%d",
@@ -87,10 +98,23 @@ class MoviePilotNotifyEntity(NotifyEntity):
             )
 
             if success:
-                _LOGGER.info("Successfully sent notification to MoviePilot: %s", title)
+                _LOGGER.info(
+                    "✅ Successfully sent notification to MoviePilot: [%s] %s",
+                    notification_type,
+                    title,
+                )
             else:
-                _LOGGER.warning("Failed to send notification to MoviePilot: %s", title)
+                _LOGGER.warning(
+                    "⚠️ Failed to send notification to MoviePilot: [%s] %s - Check API response",
+                    notification_type,
+                    title,
+                )
 
         except Exception as err:
-            _LOGGER.error("Error sending notification to MoviePilot: %s", err)
+            _LOGGER.error(
+                "❌ Error sending notification to MoviePilot: [%s] %s - Error: %s",
+                notification_type,
+                title,
+                err,
+            )
             raise

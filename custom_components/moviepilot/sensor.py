@@ -39,6 +39,7 @@ from .const import (
     BYTES_TO_GB,
     DATA_CLIENT,
     DOMAIN,
+    ICON_CLOUD,
     ICON_CPU,
     ICON_DISK,
     ICON_DOWNLOAD,
@@ -70,7 +71,7 @@ async def async_setup_entry(
     # 首次刷新数据
     await coordinator.async_config_entry_first_refresh()
 
-    # 创建所有传感器（10个传感器）
+    # 创建所有传感器（12个传感器：10个原有 + 2个消息通知）
     sensors: list[SensorEntity] = [
         # 系统监控传感器 (4个)
         MoviePilotCPUSensor(coordinator, entry),
@@ -86,6 +87,9 @@ async def async_setup_entry(
         MoviePilotTVCountSensor(coordinator, entry),
         MoviePilotEpisodeCountSensor(coordinator, entry),
         MoviePilotUserCountSensor(coordinator, entry),
+        # 消息通知传感器 (2个) - 监控状态变化并触发事件
+        MoviePilotDownloadMessageSensor(coordinator, entry),
+        MoviePilotTransferMessageSensor(coordinator, entry),
     ]
 
     async_add_entities(sensors)
@@ -377,4 +381,211 @@ class MoviePilotUserCountSensor(MoviePilotSensorBase):
     def native_value(self) -> int | None:
         """Return the state."""
         return self.coordinator.data.get("user_count")
+
+
+# ========== 消息通知传感器 ==========
+
+
+class MoviePilotDownloadMessageSensor(MoviePilotSensorBase):
+    """MoviePilot 下载消息传感器 - 监控下载状态变化并触发通知事件"""
+
+    _attr_name = "下载通知"
+    _attr_icon = ICON_DOWNLOAD
+
+    def __init__(
+        self,
+        coordinator: MoviePilotDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry, "download_message")
+        self._last_downloading = None
+
+    @property
+    def native_value(self) -> str:
+        """Return the state."""
+        is_downloading = self.coordinator.data.get("is_downloading", False)
+
+        if is_downloading:
+            return "下载中"
+        elif self._last_downloading:
+            return "下载完成"
+        else:
+            return "空闲"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional attributes."""
+        from datetime import datetime
+
+        return {
+            "download_speed": self.coordinator.data.get("downloader_download_speed", 0),
+            "total_downloaded": self.coordinator.data.get("downloader_total_downloaded", 0),
+            "is_downloading": self.coordinator.data.get("is_downloading", False),
+            "last_update": datetime.now().isoformat(),
+        }
+
+    async def async_update(self) -> None:
+        """Update the entity."""
+        await super().async_update()
+
+        # 检查下载状态变化
+        is_downloading = self.coordinator.data.get("is_downloading", False)
+
+        # 下载开始
+        if is_downloading and not self._last_downloading:
+            download_speed = self.coordinator.data.get("downloader_download_speed", 0)
+            self._fire_event(
+                "Download",
+                "📥 开始下载",
+                f"下载速度: {self._format_speed(download_speed)}",
+            )
+
+        # 下载完成
+        elif not is_downloading and self._last_downloading:
+            total_downloaded = self.coordinator.data.get("downloader_total_downloaded", 0)
+            self._fire_event(
+                "Download",
+                "✅ 下载完成",
+                f"累计下载: {self._format_size(total_downloaded)}",
+            )
+
+        self._last_downloading = is_downloading
+
+    def _fire_event(self, message_type: str, title: str, message: str) -> None:
+        """触发 Home Assistant 事件"""
+        from datetime import datetime
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_notification",
+            {
+                "type": message_type,
+                "title": title,
+                "message": message,
+                "timestamp": datetime.now().isoformat(),
+                "source": "moviepilot",
+            },
+        )
+
+        _LOGGER.info(
+            "触发通知事件: [%s] %s - %s",
+            message_type,
+            title,
+            message,
+        )
+
+    @staticmethod
+    def _format_speed(bytes_per_sec: float) -> str:
+        """格式化速度"""
+        if bytes_per_sec >= 1024**3:
+            return f"{bytes_per_sec / 1024**3:.2f} GB/s"
+        elif bytes_per_sec >= 1024**2:
+            return f"{bytes_per_sec / 1024**2:.2f} MB/s"
+        elif bytes_per_sec >= 1024:
+            return f"{bytes_per_sec / 1024:.2f} KB/s"
+        else:
+            return f"{bytes_per_sec:.0f} B/s"
+
+    @staticmethod
+    def _format_size(bytes_value: float) -> str:
+        """格式化大小"""
+        if bytes_value >= 1024**3:
+            return f"{bytes_value / 1024**3:.2f} GB"
+        elif bytes_value >= 1024**2:
+            return f"{bytes_value / 1024**2:.2f} MB"
+        elif bytes_value >= 1024:
+            return f"{bytes_value / 1024:.2f} KB"
+        else:
+            return f"{bytes_value:.0f} B"
+
+
+class MoviePilotTransferMessageSensor(MoviePilotSensorBase):
+    """MoviePilot 整理消息传感器 - 监控整理状态变化并触发通知事件"""
+
+    _attr_name = "整理通知"
+    _attr_icon = ICON_CLOUD
+
+    def __init__(
+        self,
+        coordinator: MoviePilotDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, entry, "transfer_message")
+        self._last_transferring = None
+
+    @property
+    def native_value(self) -> str:
+        """Return the state."""
+        is_transferring = self.coordinator.data.get("is_transferring", False)
+
+        if is_transferring:
+            return "整理中"
+        elif self._last_transferring:
+            return "整理完成"
+        else:
+            return "空闲"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return additional attributes."""
+        from datetime import datetime
+
+        return {
+            "is_transferring": self.coordinator.data.get("is_transferring", False),
+            "transfer_data": self.coordinator.data.get("transfer_data", {}),
+            "movie_count": self.coordinator.data.get("movie_count", 0),
+            "tv_count": self.coordinator.data.get("tv_count", 0),
+            "last_update": datetime.now().isoformat(),
+        }
+
+    async def async_update(self) -> None:
+        """Update the entity."""
+        await super().async_update()
+
+        # 检查整理状态变化
+        is_transferring = self.coordinator.data.get("is_transferring", False)
+
+        # 整理开始
+        if is_transferring and not self._last_transferring:
+            self._fire_event(
+                "Transfer",
+                "📁 开始整理",
+                "正在整理文件到媒体库...",
+            )
+
+        # 整理完成
+        elif not is_transferring and self._last_transferring:
+            movie_count = self.coordinator.data.get("movie_count", 0)
+            tv_count = self.coordinator.data.get("tv_count", 0)
+            self._fire_event(
+                "Transfer",
+                "✅ 整理完成",
+                f"媒体库: 电影 {movie_count} 部, 剧集 {tv_count} 部",
+            )
+
+        self._last_transferring = is_transferring
+
+    def _fire_event(self, message_type: str, title: str, message: str) -> None:
+        """触发 Home Assistant 事件"""
+        from datetime import datetime
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_notification",
+            {
+                "type": message_type,
+                "title": title,
+                "message": message,
+                "timestamp": datetime.now().isoformat(),
+                "source": "moviepilot",
+            },
+        )
+
+        _LOGGER.info(
+            "触发通知事件: [%s] %s - %s",
+            message_type,
+            title,
+            message,
+        )
+
 

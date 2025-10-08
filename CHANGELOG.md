@@ -1,206 +1,110 @@
-# 更新日志
+# Changelog
 
-本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 规范。
+All notable changes to this project will be documented in this file.
 
-## [4.1.0] - 2025-10-08
+## [1.0.0] - 2025-10-08
 
-### ✨ 新增
+### 🎉 首次发布
 
-- **通知服务** - 新增 `moviepilot.send_notification` 服务
-  - 支持从 Home Assistant 向 MoviePilot 发送通知消息
-  - 可在自动化和脚本中调用
-  - 在开发工具→服务中可见和测试
-  - 支持自定义标题和消息内容
+这是 MoviePilot Home Assistant 集成的首个正式版本，提供完整的 MoviePilot 监控和双向通知功能。
 
-- **媒体统计传感器** (4个)
-  - `sensor.moviepilot_movie_count` - 电影数量
-  - `sensor.moviepilot_tv_count` - 剧集数量
-  - `sensor.moviepilot_episode_count` - 剧集集数
-  - `sensor.moviepilot_user_count` - 用户数量
+### ✨ 新增功能
 
-### 🔄 变更
+#### 核心功能
+- ✅ 完整的 MoviePilot 服务监控
+- ✅ 12 个状态传感器
+- ✅ 3 个二进制传感器
+- ✅ 双向通知支持
 
-- **设备信息更新**
-  - 制造商：MoviePilot → **buynow**
-  - 固件版本：v2.0 → **moviepilot V2**
+#### 传感器
 
-- **实体数量**
-  - 从 9 个实体增加到 **13 个实体 + 1个服务**
-  - 传感器：6 个 → **10 个**（新增 4 个媒体统计）
-  - 二进制传感器：3 个（保持不变）
-  - 服务：**1 个**（新增 moviepilot.send_notification）
+**系统监控 (4个)**
+- CPU 使用率 (`sensor.moviepilot_cpu_usage`)
+- 内存使用率 (`sensor.moviepilot_memory_usage`)
+- 磁盘使用率 (`sensor.moviepilot_disk_usage`)
+- 磁盘剩余空间 (`sensor.moviepilot_disk_free`)
 
-- **实体类别优化**
-  - 媒体统计传感器从"诊断"类别移至主要实体区域
-  - 所有实体在集成页面主区域显示，更易于访问
+**下载器监控 (1个)**
+- 下载速度 (`sensor.moviepilot_download_speed`)
 
-### 📝 文档
+**任务管理 (1个)**
+- 运行中任务数 (`sensor.moviepilot_running_tasks`)
 
-- 更新 README.md 添加通知服务说明
-- 新增通知服务使用示例
-- 新增媒体库监控自动化示例
-- 更新 FAQ 说明实体配置
+**媒体统计 (4个)**
+- 电影数量 (`sensor.moviepilot_movie_count`)
+- 剧集数量 (`sensor.moviepilot_tv_count`)
+- 剧集集数 (`sensor.moviepilot_episode_count`)
+- 用户数量 (`sensor.moviepilot_user_count`)
 
-### 📦 API
+**消息通知 (2个) ⭐ 特色功能**
+- 下载通知 (`sensor.moviepilot_下载通知`) - 监控下载状态变化
+- 整理通知 (`sensor.moviepilot_整理通知`) - 监控整理状态变化
 
-- 新增 `send_notification()` 方法
-- 优化 `get_system_info()` 返回版本信息
+**二进制传感器 (3个)**
+- 在线状态 (`binary_sensor.moviepilot_online`)
+- 任务运行状态 (`binary_sensor.moviepilot_tasks_running`)
+- 下载状态 (`binary_sensor.moviepilot_downloading`)
 
----
+#### 通知服务
 
-## [4.0.0] - 2025-10-08
+**发送通知到 MoviePilot**
+- `notify.moviepilot` - 标准 Home Assistant notify 服务
+- `moviepilot.send_notification` - 自定义服务
+- 支持 4 种通知类型：Manual, System, Download, Transfer
 
-### 🎯 重大变更
+**接收 MoviePilot 通知 ⭐ 特色功能**
+- 自动监控下载/整理状态变化
+- 触发 `moviepilot_notification` 事件
+- 可通过自动化接收和处理通知
 
-**精简架构** - 从 24 个实体简化至 9 个核心实体，专注于最常用的监控功能。
+### 📚 文档
 
-### ✨ 新增
+- ✅ README.md - 完整功能介绍和快速开始
+- ✅ RECEIVE_NOTIFICATIONS.md - 通知接收详细指南（20+ 自动化示例）
+- ✅ NOTIFICATION_GUIDE.md - 通知发送详细指南
+- ✅ LICENSE - MIT 开源许可证
 
-- 全新的 HACS 兼容性支持
-- 完整的中文文档（README.md 和 CHANGELOG.md）
-- MIT 开源许可证
-- 更清晰的实体命名和分类
+### 🔧 技术实现
 
-### 🔄 变更
+- 基于 MoviePilot API v1
+- 完整的错误处理和日志记录
+- 优化的并发请求
+- 参数验证和自动降级
+- 符合 Home Assistant 2024.1+ 标准
+- 完全符合 HACS 集成规范
 
-- **传感器数量**: 从 18 个减少到 6 个
-  - 保留: CPU 使用率、内存使用率、磁盘使用率、磁盘可用空间、下载速度、运行中任务
-  - 移除: 网络传感器、媒体统计、系统详情、任务队列等 12 个传感器
+### 🎯 支持的功能
 
-- **二进制传感器数量**: 从 4 个减少到 3 个
-  - 保留: 在线状态、有任务运行、下载中
-  - 移除: 文件传输中
+- ✅ 实时系统资源监控
+- ✅ 下载任务监控
+- ✅ 整理任务监控
+- ✅ 媒体库统计
+- ✅ 双向通知通信
+- ✅ 事件驱动的通知系统
+- ✅ 灵活的自动化集成
 
-- **按钮**: 移除所有按钮（刷新数据、测试连接）
+### 🌟 亮点特性
 
-- **服务**: 移除所有服务功能
+1. **零配置通知接收** - 安装即用，自动监控 MoviePilot 状态变化
+2. **丰富的自动化示例** - 提供 20+ 实用自动化配置
+3. **完整的状态监控** - 15 个实体全方位监控
+4. **双向通信** - HA ↔ MoviePilot 完美互通
+5. **HACS 集成** - 一键安装，自动更新
 
-### 🗑️ 移除
+### 🐛 已知问题
 
-- 删除 `button.py` - 不再提供按钮实体
-- 删除 `services.yaml` - 不再提供服务功能
-- 移除搜索和下载相关功能（需要更高 API 权限）
-- 移除媒体库统计功能（电影数量、剧集数量等）
-- 移除网络监控功能（上传下载统计）
+无
 
-### 📦 优化
+### 📝 注意事项
 
-- 精简 `const.py` - 从 164 行减少到 98 行，移除所有未使用的常量
-- 更新 `strings.json` 和 `translations/zh-Hans.json` - 移除已删除实体的翻译
-- 优化代码结构，减少维护复杂度
-- 更新 GitHub 仓库链接到 `buynow/moviepilot-ha`
+- 需要 Home Assistant 2024.1.0 或更高版本
+- 需要 MoviePilot V2 或更高版本
+- 需要有效的 MoviePilot API Token
 
-### 📝 文档
+### 🙏 致谢
 
-- 重写 README.md - 全中文、HACS 标准格式、详细的实体说明
-- 新增 Lovelace 卡片示例（4 种不同类型）
-- 新增自动化示例（4 个实用场景）
-- 完善故障排查指南
-- 新增常见问题解答（FAQ）
-
-### 🎨 用户体验
-
-- 更简洁的实体列表，易于理解和使用
-- 专注于核心监控功能，减少信息过载
-- 保留最常用的 9 个实体，满足日常监控需求
-
-### ⚠️ 升级注意事项
-
-**从 v3.0.0 升级到 v4.0.0 的用户请注意：**
-
-1. **实体数量大幅减少** - 从 24 个减少到 9 个，许多实体将不再可用
-2. **自动化可能失效** - 如果您的自动化使用了已移除的实体，需要更新
-3. **Lovelace 卡片需要调整** - 移除对已删除实体的引用
-4. **无服务功能** - 不再提供 `moviepilot.refresh_data` 等服务
-
-**建议操作：**
-- 升级前备份您的配置
-- 检查现有自动化和 Lovelace 卡片
-- 参考新的 README.md 重新配置
+感谢所有测试和反馈的用户！
 
 ---
 
-## [3.0.0] - 2025-10-06
-
-### ✨ 新增
-
-- 全面重构，基于实际 MoviePilot API v2.0+ 测试
-- 24 个实体（18 个传感器 + 4 个二进制传感器 + 2 个按钮）
-- 并发 API 请求，显著提升性能
-- 完整的开发文档和 API 测试工具
-
-### 📊 传感器 (18个)
-
-**系统监控 (7个)**:
-- CPU 使用率
-- 内存使用率、已用内存
-- 磁盘使用率、磁盘总量
-
-**网络监控 (2个)**:
-- 网络上传速度
-- 网络下载速度
-
-**媒体统计 (4个)**:
-- 电影数量
-- 剧集数量
-- 集数统计
-- 用户数量
-
-**下载器 (3个)**:
-- 下载速度、上传速度
-- 累计下载量、累计上传量
-
-**任务监控 (2个)**:
-- 运行中任务
-- 等待中任务
-
-### 🔘 二进制传感器 (4个)
-
-- 在线状态
-- 任务运行状态
-- 文件传输中
-- 下载状态
-
-### 🔲 按钮 (2个)
-
-- 刷新数据
-- 测试连接
-
-### 🚀 技术特性
-
-- 30 秒自动更新间隔（可配置）
-- 完善的错误处理机制
-- 所有 API 端点经过实测验证
-- 支持 MoviePilot v2.0 及以上版本
-
-### 📖 文档
-
-- 详细的 API 文档 (`dev/API_MAPPING.md`)
-- 重构总结报告 (`dev/UPGRADE_SUMMARY.md`)
-- API 测试工具 (`dev/test_api.py`)
-- 完整的开发会话记录
-
----
-
-## 版本对比总结
-
-| 特性 | v3.0.0 | v4.0.0 |
-|------|--------|--------|
-| 总实体数 | 24 | 9 |
-| 传感器 | 18 | 6 |
-| 二进制传感器 | 4 | 3 |
-| 按钮 | 2 | 0 |
-| 服务 | 0 | 0 |
-| HACS 支持 | ❌ | ✅ |
-| 中文文档 | 部分 | 完整 |
-| 开源许可 | 未声明 | MIT |
-| 代码复杂度 | 高 | 低 |
-| 维护难度 | 较难 | 简单 |
-| 用户体验 | 功能丰富 | 简洁清晰 |
-
----
-
-## 发布链接
-
-- [v4.0.0](https://github.com/buynow/moviepilot-ha/releases/tag/v4.0.0) - 2025-10-08
-- [v3.0.0](https://github.com/buynow/moviepilot-ha/releases/tag/v3.0.0) - 2025-10-06
+**完整变更**: https://github.com/buynow2010/Moviepilot-HA/commits/v1.0.0
