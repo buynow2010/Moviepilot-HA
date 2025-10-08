@@ -1,0 +1,13 @@
+{
+  "entity_component": {
+    "_": {
+      "default": "mdi:movie-open"
+    }
+  },
+  "services": {
+    "search_media": "mdi:magnify",
+    "add_download": "mdi:download",
+    "refresh_library": "mdi:refresh",
+    "send_notification": "mdi:bell"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to MoviePilot",
+        "description": "Enter your MoviePilot server details and API Token",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "api_token": "API Token",
+          "name": "Name"
+        },
+        "data_description": {
+          "host": "IP address or hostname of your MoviePilot server (e.g., 192.168.1.100)",
+          "port": "Port number (default: 3000)",
+          "api_token": "API Token from MoviePilot Settings \u2192 Security \u2192 API Token",
+          "name": "Friendly name for this MoviePilot instance"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate MoviePilot",
+        "description": "The API Token has expired or is invalid. Please enter a new API Token.",
+        "data": {
+          "api_token": "API Token"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to MoviePilot server. Please check host and port.",
+      "invalid_auth": "Invalid API Token. Please check your token in MoviePilot Settings.",
+      "unknown": "Unexpected error occurred. Please check the logs."
+    },
+    "abort": {
+      "already_configured": "This MoviePilot server is already configured.",
+      "reauth_successful": "Re-authentication successful!"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接到 MoviePilot",
+        "description": "请输入您的 MoviePilot 服务器信息和 API 令牌。",
+        "data": {
+          "host": "主机地址",
+          "port": "端口",
+          "api_token": "API 令牌",
+          "name": "集成名称"
+        },
+        "data_description": {
+          "host": "MoviePilot 服务器的 IP 地址或域名（如：192.168.1.100）",
+          "port": "MoviePilot 服务端口（默认 3000）",
+          "api_token": "在 MoviePilot 设置 → 安全 → API 令牌 中获取",
+          "name": "此 MoviePilot 实例的友好名称"
+        }
+      },
+      "reauth_confirm": {
+        "title": "重新认证 MoviePilot",
+        "description": "API 令牌已过期或无效，请输入新的 API 令牌。",
+        "data": {
+          "api_token": "API 令牌"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接到 MoviePilot 服务器，请检查地址和端口。",
+      "invalid_auth": "API 令牌无效，请在 MoviePilot 设置中检查您的令牌。",
+      "unknown": "发生未知错误，请查看日志了解详情。"
+    },
+    "abort": {
+      "already_configured": "该 MoviePilot 服务器已配置。",
+      "reauth_successful": "重新认证成功！"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "cpu": {
+        "name": "CPU 使用率"
+      },
+      "memory": {
+        "name": "内存使用率"
+      },
+      "disk": {
+        "name": "磁盘使用率"
+      },
+      "disk_free": {
+        "name": "磁盘可用空间"
+      },
+      "downloader_speed": {
+        "name": "下载速度"
+      },
+      "running_tasks": {
+        "name": "运行中任务"
+      },
+      "movie_count": {
+        "name": "电影数量"
+      },
+      "tv_count": {
+        "name": "剧集数量"
+      },
+      "episode_count": {
+        "name": "剧集集数"
+      },
+      "user_count": {
+        "name": "用户数量"
+      }
+    },
+    "binary_sensor": {
+      "online": {
+        "name": "在线状态",
+        "state": {
+          "on": "在线",
+          "off": "离线"
+        }
+      },
+      "tasks_running": {
+        "name": "有任务运行",
+        "state": {
+          "on": "运行中",
+          "off": "空闲"
+        }
+      },
+      "downloading": {
+        "name": "下载中",
+        "state": {
+          "on": "下载中",
+          "off": "空闲"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+send_notification:
+  name: 发送通知
+  description: 向 MoviePilot 服务器发送通知消息
+  fields:
+    title:
+      name: 标题
+      description: 通知消息的标题
+      required: true
+      example: "磁盘空间警告"
+      selector:
+        text:
+    message:
+      name: 消息内容
+      description: 通知的详细内容
+      required: true
+      example: "剩余空间仅 50GB，请及时清理！"
+      selector:
+        text:
+          multiline: true
+    type:
+      name: 通知类型
+      description: 通知的类型分类（可选）
+      required: false
+      default: "Manual"
+      example: "Download"
+      selector:
+        select:
+          options:
+            - "Manual"
+            - "System"
+            - "Download"
+            - "Transfer"
