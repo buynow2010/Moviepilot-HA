@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2025-10-08
+
+### 🐛 Bug Fixes
+
+**修复 HACS 集成下载问题**
+
+- ✅ 修复 hacs.json 配置 - 添加 `filename` 字段
+- ✅ 移除 .DS_Store 系统文件
+- ✅ 更新 .gitignore 规则
+- ✅ 优化仓库文件结构
+
+**影响**: 现在可以通过 HACS 正常下载和安装集成
+
+### 📝 说明
+
+此版本主要修复 HACS 集成配置问题。如果你在 v1.0.0 遇到 HACS 下载失败，请：
+1. 在 HACS 中移除旧版本
+2. 重新添加自定义仓库
+3. 安装 v1.0.1
+
+---
+
 ## [1.0.0] - 2025-10-08
 
 ### 🎉 首次发布
