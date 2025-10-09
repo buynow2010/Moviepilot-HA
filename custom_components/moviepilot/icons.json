@@ -7,7 +7,6 @@
   "services": {
     "search_media": "mdi:magnify",
     "add_download": "mdi:download",
-    "refresh_library": "mdi:refresh",
-    "send_notification": "mdi:bell"
+    "refresh_library": "mdi:refresh"
   }
 }

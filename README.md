@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/buynow2010/Moviepilot-HA.svg)](https://github.com/buynow2010/Moviepilot-HA/releases)
 [![License](https://img.shields.io/github/license/buynow2010/Moviepilot-HA.svg)](LICENSE)
 
-将 MoviePilot 媒体管理平台无缝集成到 Home Assistant，实现系统监控、状态跟踪和双向通知。
+将 MoviePilot 媒体管理平台无缝集成到 Home Assistant，实现系统监控、状态跟踪和通知接收。
 
 [English](README_EN.md) | 简体中文
 
@@ -37,9 +37,8 @@
 - **媒体统计**: 电影、剧集数量和用户统计
 - **状态监控**: 下载和整理状态通知
 
-### 🔔 双向通知
+### 🔔 通知接收
 - **接收通知**: Webhook 实时推送 + 状态变化监控
-- **发送通知**: 标准 notify 服务，支持 4 种通知类型
 
 ---
 
@@ -112,23 +111,6 @@ automation:
           message: "{{ trigger.event.data.message }}"
 ```
 
-### 发送通知
-
-```yaml
-automation:
-  - alias: "磁盘空间警告"
-    trigger:
-      - platform: numeric_state
-        entity_id: sensor.moviepilot_disk_usage
-        above: 90
-    action:
-      - service: notify.moviepilot
-        data:
-          title: "磁盘空间不足"
-          message: "使用率已达 {{ states('sensor.moviepilot_disk_usage') }}%"
-          data:
-            type: "System"
-```
 
 ### Lovelace 卡片
 
@@ -170,28 +152,7 @@ entities:
 
 ---
 
-## 服务
-
-### notify.moviepilot
-
-```yaml
-service: notify.moviepilot
-data:
-  title: "标题"
-  message: "内容"
-  data:
-    type: "Manual"  # Manual/System/Download/Transfer
-```
-
-### moviepilot.send_notification
-
-```yaml
-service: moviepilot.send_notification
-data:
-  title: "标题"
-  message: "内容"
-  type: "System"
-```
+ 
 
 ---
 

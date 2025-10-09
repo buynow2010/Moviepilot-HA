@@ -5,6 +5,6 @@
   "homeassistant": "2024.1.0",
   "render_readme": true,
   "zip_release": false,
-  "domains": ["sensor", "binary_sensor", "notify"],
+  "domains": ["sensor", "binary_sensor"],
   "iot_class": "Cloud Polling"
 }

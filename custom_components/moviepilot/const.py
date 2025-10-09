@@ -96,8 +96,8 @@ BYTES_TO_KB: Final = 1024
 DATA_COORDINATOR: Final = "coordinator"
 DATA_CLIENT: Final = "client"
 
-# Platforms
-PLATFORMS: Final = ["sensor", "binary_sensor", "notify"]
+# Platforms (notification service removed)
+PLATFORMS: Final = ["sensor", "binary_sensor"]
 
 # Notification defaults
 NOTIFY_DEFAULT_TITLE: Final = "Home Assistant"

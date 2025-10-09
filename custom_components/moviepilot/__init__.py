@@ -4,13 +4,10 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_TOKEN, CONF_HOST, CONF_PORT, Platform
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MoviePilotAPIClient, MoviePilotAuthError, MoviePilotConnectionError
@@ -20,21 +17,11 @@ from .webhook import async_setup_webhook, get_webhook_url
 
 _LOGGER = logging.getLogger(__name__)
 
-# Platforms to set up
+# Platforms to set up (notification service removed)
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
-    Platform.NOTIFY,
 ]
-
-# Service schema
-SERVICE_SEND_NOTIFICATION_SCHEMA = vol.Schema(
-    {
-        vol.Required("title"): cv.string,
-        vol.Required("message"): cv.string,
-        vol.Optional("type", default="Manual"): cv.string,
-    }
-)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -84,32 +71,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # 设置平台
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    # 注册服务
-    async def handle_send_notification(call: ServiceCall) -> None:
-        """Handle send notification service call."""
-        title = call.data.get("title")
-        message = call.data.get("message")
-        notification_type = call.data.get("type", "Manual")
-
-        try:
-            success = await client.send_notification(title, message, notification_type)
-            if success:
-                _LOGGER.info("通知发送成功: %s", title)
-            else:
-                _LOGGER.warning("通知发送失败: %s", title)
-        except Exception as err:
-            _LOGGER.error("发送通知时出错: %s", err)
-
-    # 只在第一个实例时注册服务
-    if not hass.services.has_service(DOMAIN, "send_notification"):
-        hass.services.async_register(
-            DOMAIN,
-            "send_notification",
-            handle_send_notification,
-            schema=SERVICE_SEND_NOTIFICATION_SCHEMA,
-        )
-        _LOGGER.info("已注册 moviepilot.send_notification 服务")
-
     # 设置 Webhook 接收器（全局设置，只执行一次）
     if "webhook_setup" not in hass.data[DOMAIN]:
         webhook_success = await async_setup_webhook(hass)
@@ -154,11 +115,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
 
-        # 如果没有其他实例，移除服务
-        if not hass.data[DOMAIN]:
-            hass.services.async_remove(DOMAIN, "send_notification")
-            _LOGGER.info("已移除 moviepilot.send_notification 服务")
-
         _LOGGER.info("MoviePilot集成已卸载")
 
     return unload_ok
@@ -168,4 +124,3 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload config entry."""
     await async_unload_entry(hass, entry)
     await async_setup_entry(hass, entry)
-
