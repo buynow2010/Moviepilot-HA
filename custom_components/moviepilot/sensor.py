@@ -45,7 +45,6 @@ from .const import (
     ICON_DOWNLOAD,
     ICON_MEMORY,
     ICON_MOVIE,
-    ICON_SERVER,
     ICON_TASK,
     ICON_TV,
     ICON_USER,

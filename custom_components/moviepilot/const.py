@@ -20,7 +20,6 @@ DEFAULT_TIMEOUT: Final = 30  # seconds
 UPDATE_INTERVAL_DASHBOARD: Final = timedelta(seconds=30)  # System metrics
 
 # API endpoints (all tested and verified)
-API_ENDPOINT_MESSAGE: Final = "/api/v1/message/"
 API_ENDPOINT_CPU: Final = "/api/v1/dashboard/cpu2"
 API_ENDPOINT_MEMORY: Final = "/api/v1/dashboard/memory2"
 API_ENDPOINT_STORAGE: Final = "/api/v1/dashboard/storage2"
@@ -63,7 +62,6 @@ ICON_MEMORY: Final = "mdi:memory"
 ICON_DISK: Final = "mdi:harddisk"
 ICON_DOWNLOAD: Final = "mdi:download"
 ICON_TASK: Final = "mdi:calendar-clock"
-ICON_SERVER: Final = "mdi:server"
 ICON_CLOUD: Final = "mdi:cloud"
 ICON_MOVIE: Final = "mdi:movie"
 ICON_TV: Final = "mdi:television"
@@ -98,10 +96,3 @@ DATA_CLIENT: Final = "client"
 
 # Platforms (notification service removed)
 PLATFORMS: Final = ["sensor", "binary_sensor"]
-
-# Notification defaults
-NOTIFY_DEFAULT_TITLE: Final = "Home Assistant"
-NOTIFY_TYPE_MANUAL: Final = "Manual"
-NOTIFY_TYPE_SYSTEM: Final = "System"
-NOTIFY_TYPE_DOWNLOAD: Final = "Download"
-NOTIFY_TYPE_TRANSFER: Final = "Transfer"

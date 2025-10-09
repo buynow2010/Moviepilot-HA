@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/buynow2010/Moviepilot-HA.svg)](https://github.com/buynow2010/Moviepilot-HA/releases)
 [![License](https://img.shields.io/github/license/buynow2010/Moviepilot-HA.svg)](LICENSE)
 
-将 MoviePilot 媒体管理平台无缝集成到 Home Assistant，实现系统监控、状态跟踪和通知接收。
+将 MoviePilot 媒体管理平台无缝集成到 Home Assistant，实现系统监控与状态跟踪。
 
 [English](README_EN.md) | 简体中文
 
@@ -31,14 +31,11 @@
 
 ## 功能特性
 
-### 📊 监控传感器（15个）
-- **系统监控**: CPU、内存、磁盘使用率和可用空间
-- **下载管理**: 下载速度和任务状态
-- **媒体统计**: 电影、剧集数量和用户统计
-- **状态监控**: 下载和整理状态通知
-
-### 🔔 通知接收
-- **接收通知**: Webhook 实时推送 + 状态变化监控
+### 📊 监控传感器
+- 系统监控：CPU、内存、磁盘使用率和可用空间
+- 下载管理：下载速度与任务状态
+- 媒体统计：电影、剧集数量和用户统计
+- 状态监控：下载与整理状态
 
 ---
 
@@ -81,36 +78,11 @@
 - **端口**: 默认 `3000`
 - **API Token**: 在 MoviePilot → 设置 → API 中获取
 
-### 2. Webhook 通知（可选）
-
-安装后查看 HA 日志获取 Webhook URL，在 MoviePilot 中配置：
-
-**设置** → **通知** → **添加 Webhook**:
-```
-URL: http://你的HA地址:8123/api/moviepilot/webhook
-方法: POST
-请求体: {"title": "{{title}}", "text": "{{message}}", "type": "{{type}}"}
-```
+ 
 
 ---
 
 ## 使用示例
-
-### 接收通知
-
-```yaml
-automation:
-  - alias: "MoviePilot 通知"
-    trigger:
-      - platform: event
-        event_type: moviepilot_notification
-    action:
-      - service: notify.mobile_app_your_phone
-        data:
-          title: "{{ trigger.event.data.title }}"
-          message: "{{ trigger.event.data.message }}"
-```
-
 
 ### Lovelace 卡片
 
@@ -129,7 +101,7 @@ entities:
 
 ## 实体列表
 
-### 传感器（12个）
+### 传感器
 | 实体 ID | 说明 |
 |---------|------|
 | `sensor.moviepilot_cpu_usage` | CPU 使用率 (%) |
@@ -142,8 +114,7 @@ entities:
 | `sensor.moviepilot_tv_count` | 剧集数量 |
 | `sensor.moviepilot_episode_count` | 剧集集数 |
 | `sensor.moviepilot_user_count` | 用户数量 |
-| `sensor.moviepilot_下载通知` | 下载状态监控 |
-| `sensor.moviepilot_整理通知` | 整理状态监控 |
+ 
 
 ### 二进制传感器（3个）
 - `binary_sensor.moviepilot_online` - 在线状态
@@ -156,22 +127,7 @@ entities:
 
 ---
 
-## 事件
-
-### moviepilot_notification
-
-MoviePilot 状态变化或 Webhook 接收通知时触发
-
-事件数据:
-```python
-{
-    "type": "Download",              # 通知类型
-    "title": "下载完成",              # 标题
-    "message": "累计下载: 15.2 GB",   # 内容
-    "timestamp": "2025-10-08T...",   # 时间戳
-    "source": "moviepilot_webhook"   # 来源
-}
-```
+ 
 
 ---
 
@@ -192,10 +148,7 @@ logger:
 - 验证主机地址和端口
 - 确认 API Token 有效
 
-**无法接收通知**
-- 查看 HA 日志中的 Webhook URL
-- 确认 MoviePilot 中 Webhook 配置正确
-- 检查 `sensor.moviepilot_下载通知` 状态
+ 
 
 ---
 

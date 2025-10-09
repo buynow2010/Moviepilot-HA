@@ -17,7 +17,6 @@ from .const import (
     API_ENDPOINT_CPU,
     API_ENDPOINT_DOWNLOADER,
     API_ENDPOINT_MEMORY,
-    API_ENDPOINT_MESSAGE,
     API_ENDPOINT_NETWORK,
     API_ENDPOINT_SCHEDULE,
     API_ENDPOINT_STATISTIC,
@@ -197,17 +196,17 @@ class MoviePilotAPIClient:
             MoviePilotAuthError: 认证失败
             MoviePilotConnectionError: 连接失败
         """
-        result = await self._request("GET", API_ENDPOINT_MESSAGE)
+        # 使用统计信息端点进行连接测试
+        result = await self._request("GET", API_ENDPOINT_STATISTIC)
 
-        if isinstance(result, dict) and result.get("status") == "OK":
+        if isinstance(result, dict):
             _LOGGER.info("MoviePilot连接测试成功")
             return {
                 "name": "MoviePilot",
                 "status": "connected",
-                "endpoint": API_ENDPOINT_MESSAGE,
+                "endpoint": API_ENDPOINT_STATISTIC,
             }
-        else:
-            raise MoviePilotAPIError("Unexpected response from MoviePilot")
+        raise MoviePilotAPIError("Unexpected response from MoviePilot")
 
     # ========== Dashboard API (已验证可用) ==========
 
@@ -555,91 +554,4 @@ class MoviePilotAPIClient:
             _LOGGER.warning("获取系统信息失败: %s", err)
             return {"version": "unknown"}
 
-    # ========== 通知服务 ==========
-
-    async def send_notification(
-        self,
-        title: str,
-        message: str,
-        notification_type: str = "Manual",
-    ) -> bool:
-        """发送通知到MoviePilot
-
-        Args:
-            title: 通知标题
-            message: 通知内容
-            notification_type: 通知类型 (Manual/System/Download/Transfer)
-
-        Returns:
-            是否发送成功
-
-        Raises:
-            MoviePilotAPIError: 发送失败
-        """
-        # 验证通知类型
-        valid_types = ["Manual", "System", "Download", "Transfer"]
-        if notification_type not in valid_types:
-            _LOGGER.warning(
-                "Invalid notification type '%s', defaulting to 'Manual'. Valid: %s",
-                notification_type,
-                ", ".join(valid_types),
-            )
-            notification_type = "Manual"
-
-        # 构建请求数据
-        data = {
-            "title": title,
-            "text": message,
-            "type": notification_type,
-        }
-
-        _LOGGER.debug(
-            "Preparing notification: title='%s', type='%s', message_length=%d",
-            title,
-            notification_type,
-            len(message),
-        )
-
-        try:
-            result = await self._request("POST", API_ENDPOINT_MESSAGE, data=data)
-
-            # 验证响应
-            if isinstance(result, dict):
-                success = result.get("success", False)
-
-                if success:
-                    _LOGGER.info(
-                        "✅ Notification sent successfully: [%s] %s",
-                        notification_type,
-                        title,
-                    )
-                    return True
-                else:
-                    error_msg = result.get("message", "Unknown error")
-                    _LOGGER.warning(
-                        "⚠️ Notification failed: [%s] %s - Response: %s",
-                        notification_type,
-                        title,
-                        error_msg,
-                    )
-                    return False
-            else:
-                _LOGGER.warning(
-                    "⚠️ Unexpected response format for notification: %s",
-                    type(result).__name__,
-                )
-                return False
-
-        except MoviePilotAuthError:
-            _LOGGER.error("❌ Authentication failed while sending notification")
-            raise
-        except MoviePilotConnectionError:
-            _LOGGER.error("❌ Connection failed while sending notification")
-            raise
-        except Exception as err:
-            _LOGGER.error(
-                "❌ Unexpected error sending notification: %s - %s",
-                type(err).__name__,
-                err,
-            )
-            raise
+    # 发送通知相关接口已移除
