@@ -76,13 +76,6 @@
           "off": "离线"
         }
       },
-      "tasks_running": {
-        "name": "有任务运行",
-        "state": {
-          "on": "运行中",
-          "off": "空闲"
-        }
-      },
       "downloading": {
         "name": "下载中",
         "state": {

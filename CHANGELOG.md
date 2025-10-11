@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-10-11
+
+### 🔧 变更
+
+- 移除以下实体：
+  - 传感器：`下载通知`、`整理通知`
+  - 二进制传感器：`有任务运行`
+- 更新文档与翻译以反映上述变更。
+
+### ⚠️ 兼容性
+
+- 这是一次破坏性变更（移除实体）。如果你在自动化或仪表盘中使用了这些实体，请相应调整配置。
+- 替代方案：仍可使用 Webhook 推送或事件总线 `moviepilot_notification` 接收来自 MoviePilot 的通知。
+
+**完整变更**: https://github.com/buynow2010/Moviepilot-HA/commits/v1.1.0
+
+---
+
 ## [1.0.0] - 2025-10-08
 
 ### 🎉 首次发布

@@ -34,7 +34,6 @@ async def async_setup_entry(
 
     sensors: list[BinarySensorEntity] = [
         MoviePilotOnlineSensor(coordinator, entry),
-        MoviePilotTasksRunningSensor(coordinator, entry),
         MoviePilotDownloadingSensor(coordinator, entry),
     ]
 
@@ -93,35 +92,6 @@ class MoviePilotOnlineSensor(MoviePilotBinarySensorBase):
         """Return True if entity is available."""
         return True  # 始终可用以显示离线状态
 
-
-class MoviePilotTasksRunningSensor(MoviePilotBinarySensorBase):
-    """Tasks running sensor."""
-
-    _attr_name = "有任务运行"
-    _attr_icon = ICON_TASK
-    _attr_device_class = BinarySensorDeviceClass.RUNNING
-
-    def __init__(
-        self,
-        coordinator: MoviePilotDataUpdateCoordinator,
-        entry: ConfigEntry,
-    ) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator, entry, "tasks_running")
-
-    @property
-    def is_on(self) -> bool:
-        """Return True if tasks are running."""
-        running_tasks = self.coordinator.data.get("running_tasks", 0)
-        return running_tasks > 0
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return additional attributes."""
-        return {
-            "running_count": self.coordinator.data.get("running_tasks", 0),
-            "pending_count": self.coordinator.data.get("pending_tasks", 0),
-        }
 
 
 class MoviePilotDownloadingSensor(MoviePilotBinarySensorBase):

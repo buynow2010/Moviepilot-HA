@@ -33,9 +33,9 @@
 
 ### 📊 监控传感器
 - 系统监控：CPU、内存、磁盘使用率和可用空间
-- 下载管理：下载速度与任务状态
+- 下载管理：下载速度
 - 媒体统计：电影、剧集数量和用户统计
-- 状态监控：下载与整理状态
+- 状态监控：下载状态
 
 ---
 
@@ -116,9 +116,8 @@ entities:
 | `sensor.moviepilot_user_count` | 用户数量 |
  
 
-### 二进制传感器（3个）
+### 二进制传感器（2个）
 - `binary_sensor.moviepilot_online` - 在线状态
-- `binary_sensor.moviepilot_tasks_running` - 任务运行状态
 - `binary_sensor.moviepilot_downloading` - 下载状态
 
 ---
